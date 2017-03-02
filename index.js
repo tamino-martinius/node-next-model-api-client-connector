@@ -118,7 +118,6 @@
       const postfix = this._postfix(options);
       const isRelative = !domain && options.Klass.routeIsRelative || false;
       const pathFragments = compact([path, version, name, id, action]);
-      // console.log(pathFragments);
       if (!isRelative) pathFragments.unshift(domain || '');
       return pathFragments.join('/') + postfix;
     }
