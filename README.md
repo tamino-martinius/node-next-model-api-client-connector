@@ -21,6 +21,72 @@ See [GitHub project](https://github.com/tamino-martinius/node-next-model-api-cli
 * Add **exists**, **join** and **subqueries**
 * There are already some **tests**, but not every test case is covered.
 
+## TOC
+
+* [Example](#example)
+## Example
+
+The connector fetches all settings from the class or base class used.
+
+~~~js
+const User = class User extends NextModel {
+  static get connector() {
+    return NextModelApiClientConnector;
+  }
+
+  static get routeDomain() {
+    return 'http://api.example.com'
+  }
+
+  static get modelName() {
+    return 'User';
+  }
+
+  static get schema() {
+    return {
+      id: { type: 'integer' },
+      name: { type: 'string' },
+    };
+  }
+}
+~~~
+
+Create an base model with the connector to use it with multiple models.
+
+~~~js
+const BaseModel = class BaseModel extends NextModel {
+  static get connector() {
+    return NextModelApiClientConnector;
+  }
+});
+
+const User = class User extends BaseModel {
+  static get modelName() {
+    return 'User';
+  }
+
+  static get schema() {
+    return {
+      id: { type: 'integer' },
+      name: { type: 'string' },
+    };
+  }
+}
+
+const Address = class Address extends BaseModel {
+  static get modelName() {
+    return 'Address';
+  }
+
+  static get schema() {
+    return {
+      id: { type: 'integer' },
+      street: { type: 'string' },
+    };
+  }
+}
+~~~
+
 ## Changelog
 
 See [history](HISTORY.md) for more details.
