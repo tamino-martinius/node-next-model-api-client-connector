@@ -11,6 +11,16 @@ Features:
 * Api **Versioning**
 * Custom **Routes** and **Actions**
 
+### Roadmap / Where can i contribute
+
+See [GitHub project](https://github.com/tamino-martinius/node-next-model-api-client-connector/projects/1) for current progress/tasks
+
+* Fix Typos
+* Add **user credentials** to queries
+* Add more **examples**
+* Add **exists**, **join** and **subqueries**
+* There are already some **tests**, but not every test case is covered.
+
 ## Changelog
 
 See [history](HISTORY.md) for more details.
