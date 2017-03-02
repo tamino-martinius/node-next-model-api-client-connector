@@ -1,0 +1,59 @@
+{
+  "name": "next-model-api-client-connector",
+  "version": "0.4.0",
+  "description": "Client side connector for NextModel Api Endpoints.",
+  "author": "Tamino Martinius <dev@zaku.eu>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tamino-martinius/node-next-model-api-client-connector.git"
+  },
+  "engines": {
+    "node": ">=4.3.2"
+  },
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "watch": {
+    "lint": {
+      "patterns": [
+        "."
+      ],
+      "extensions": [
+        "js"
+      ],
+      "inherit": true
+    },
+    "test": {
+      "patterns": [
+        "."
+      ],
+      "extensions": [
+        "js"
+      ],
+      "inherit": true
+    }
+  },
+  "scripts": {
+    "lint": "node node_modules/eslint/bin/eslint.js . || true",
+    "test": "node node_modules/mocha/bin/mocha test -u bdd-lazy-var/rspec",
+    "watch": "npm-watch"
+  },
+  "devDependencies": {
+    "bdd-lazy-var": "^1.2.0",
+    "eslint": "^2.13.1",
+    "expect-change": "0.0.1",
+    "expect.js": "^0.3.1",
+    "http-response-object": "^1.1.0",
+    "mocha": "^3.0.2",
+    "next-model": "^0.4.0",
+    "npm-watch": "^0.1.6",
+    "sinon": "^1.17.7"
+  },
+  "dependencies": {
+    "lodash": "^4.12.0",
+    "pluralize": "^3.1.0",
+    "then-request": "^2.2.0"
+  }
+}
