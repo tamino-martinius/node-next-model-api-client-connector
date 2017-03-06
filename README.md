@@ -1,6 +1,6 @@
 # NextModelApiClientConnector
 
-Api client for [ApiServer](https://github.com/tamino-martinius/node-next-model=api-server-connector) using [NextModel](https://github.com/tamino-martinius/node-next-model) package.
+Api client for [ApiServer](https://github.com/tamino-martinius/node-next-model-api-server-connector) using [NextModel](https://github.com/tamino-martinius/node-next-model) package.
 
  [![Build Status](https://travis-ci.org/tamino-martinius/node-next-model-api-client-connector.svg?branch=master)](https://travis-ci.org/tamino-martinius/node-next-model-api-client-connector)
 
