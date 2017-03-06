@@ -7,73 +7,72 @@
     context.lodash = require('lodash');
     context.pluralize = require('pluralize');
     context.request = require('then-request');
-}
+  }
+
   const request = context.request;
   const pluralize = context.pluralize;
-
   const lodash = context.lodash || context._;
+
   const assign = lodash.assign;
   const compact = lodash.compact;
   const endsWith = lodash.endsWith;
+  const find = lodash.find;
   const includes = lodash.includes;
+  const isArray = lodash.isArray;
+  const isPlainObject = lodash.isPlainObject;
   const startsWith = lodash.startsWith;
   const toUpper = lodash.toUpper;
   const trim = lodash.trim;
   const trimEnd = lodash.trimEnd;
 
   const NextModelApiClientConnector = class NextModelApiClientConnector {
-    static all(Klass) {
-      const action = Klass.allActionPath || '';
-      const method = Klass.allActionMethod;
-      return this._query({ Klass, action, method });
+    constructor(options) {
+      this.router = options.router;
     }
 
-    static first(Klass) {
-      const action = Klass.firstActionPath || '/first';
-      const method = Klass.firstActionMethod;
-      return this._query({ Klass, action, method });
+    all(Klass) {
+      return this._query({ Klass, action: 'all' });
     }
 
-    static last(Klass) {
-      const action = Klass.lastActionPath || '/last';
-      const method = Klass.lastActionMethod;
-      return this._query({ Klass, action, method });
+    first(Klass) {
+      return this._query({ Klass, action: 'first' });
     }
 
-    static count(Klass) {
-      const action = Klass.countActionPath || '/count';
-      const method = Klass.countActionMethod;
-      return this._query({ Klass, action, method });
+    last(Klass) {
+      return this._query({ Klass, action: 'last' });
     }
 
-    static save(klass) {
+    count(Klass) {
+      return this._query({ Klass, action: 'count' });
+    }
+
+    save(klass) {
       const Klass = klass.constructor;
       if (klass.isNew) {
-        const action = Klass.insertActionPath || '/create';
-        const method = Klass.insertActionMethod;
-        return this._query({ Klass, klass, action, method })
+        return this._query({ Klass, klass, action: 'create' })
           .then( attrs => {
             klass[Klass.identifier] = attrs[Klass.identifier];
             return klass;
           });
       } else {
-        const action = Klass.updateActionPath || '';
-        const method = Klass.updateActionMethod;
-        return this._query({ Klass, klass, action, method });
+        return this._query({ Klass, klass, action: 'update' });
       }
     }
 
-    static delete(klass) {
+    delete(klass) {
       const Klass = klass.constructor;
-      const action = Klass.deleteActionPath || '/delete';
-      const method = Klass.deleteActionMethod;
-      return this._query({ Klass, klass, action, method });
+      return this._query({ Klass, klass, action: 'delete' });
     }
 
-    static _query(options) {
-      const method = toUpper(options.method) || 'POST';
+    _query(options) {
+      const routeOptions = this._routeOptions(options);
+      const method = toUpper(routeOptions.method) || 'POST';
       const params = this._params(options);
-      const url = this._url(options);
+      let url = trimEnd(this.router.root, '/') + routeOptions.url;
+      // console.log(url, klass && );
+      if (options.klass && options.klass.isPersisted) {
+        url = url.replace(':' + routeOptions.identifier, options.klass[options.Klass.identifier]);
+      }
       const requestOptions = {};
       if (includes(['POST', 'PUT', 'PATCH'], method)) {
         requestOptions.json = params;
@@ -81,10 +80,28 @@
         requestOptions.qs = params;
       }
       return request(method, url, requestOptions)
-        .then(response => response.getBody());
+        .then(response => JSON.parse(response.getBody()))
+        .then(data => {
+          let result;
+          if (isArray(data)) {
+            result = data.map(item => new Klass(item));
+          } else if (isPlainObject(data)) {
+            result = new Klass(data);
+          } else {
+            result = data
+          }
+          return result;
+        });
     }
 
-    static _params(options) {
+    _routeOptions(options) {
+      return find(this.router.routes, (route) => {
+        return route.Klass.modelName === options.Klass.modelName &&
+          route.action === options.action;
+      });
+    }
+
+    _params(options) {
       const params = this._scopeParams(options);
       if (options.klass) {
         assign(params, this._itemParams(options));
@@ -92,7 +109,7 @@
       return params;
     }
 
-    static _scopeParams(options) {
+    _scopeParams(options) {
       const Klass = options.Klass;
       return {
         scope: JSON.stringify(Klass.defaultScope || {}),
@@ -102,59 +119,10 @@
       }
     }
 
-    static _itemParams(options) {
+    _itemParams(options) {
       return {
         attributes: JSON.stringify(options.klass.attributes),
       }
-    }
-
-    static _url(options) {
-      const domain = this._domain(options);
-      const path = this._path(options);
-      const version = this._version(options);
-      const name = this._name(options);
-      const id = this._id(options);
-      const action = this._action(options);
-      const postfix = this._postfix(options);
-      const isRelative = !domain && options.Klass.routeIsRelative || false;
-      const pathFragments = compact([path, version, name, id, action]);
-      if (!isRelative) pathFragments.unshift(domain || '');
-      return pathFragments.join('/') + postfix;
-    }
-
-    static _domain(options) {
-      return trimEnd(options.Klass.routeDomain, '/');
-    }
-
-    static _path(options) {
-      return trim(options.Klass.routePath, '/');
-    }
-
-    static _version(options) {
-      return trim(options.Klass.routeVersion, '/');
-    }
-
-    static _name(options) {
-      const name = trim(options.Klass.routeName || options.Klass.tableName, '/');
-      if (options.klass && options.klass.isPersisted) {
-        return pluralize(name, 1);
-      } else {
-        return pluralize(name);
-      }
-    }
-
-    static _id(options) {
-      if (options.klass && options.klass.isPersisted) {
-        return options.klass[options.Klass.identifier].toString();
-      }
-    }
-
-    static _action(options) {
-      return trim(options.action, '/');
-    }
-
-    static _postfix(options) {
-      return options.Klass.routePostfix || '';
     }
   }
 
