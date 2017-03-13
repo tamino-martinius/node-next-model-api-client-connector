@@ -20,6 +20,7 @@
   const includes = lodash.includes;
   const isArray = lodash.isArray;
   const isPlainObject = lodash.isPlainObject;
+  const map = lodash.map;
   const startsWith = lodash.startsWith;
   const toUpper = lodash.toUpper;
   const trim = lodash.trim;
@@ -31,37 +32,45 @@
     }
 
     all(Klass) {
-      return this._query({ Klass, action: 'all' });
+      return this.collectionAction(Klass, 'all');
     }
 
     first(Klass) {
-      return this._query({ Klass, action: 'first' });
+      return this.collectionAction(Klass, 'first');
     }
 
     last(Klass) {
-      return this._query({ Klass, action: 'last' });
+      return this.collectionAction(Klass, 'last');
     }
 
     count(Klass) {
-      return this._query({ Klass, action: 'count' });
+      return this.collectionAction(Klass, 'count');
     }
 
     save(klass) {
       const Klass = klass.constructor;
       if (klass.isNew) {
-        return this._query({ Klass, klass, action: 'create' })
+        return this.memberAction(klass, 'create')
           .then( attrs => {
             klass[Klass.identifier] = attrs[Klass.identifier];
             return klass;
           });
       } else {
-        return this._query({ Klass, klass, action: 'update' });
+        return this.memberAction(klass, 'update');
       }
     }
 
     delete(klass) {
+      return this.memberAction(klass, 'delete');
+    }
+
+    collectionAction(Klass, action) {
+      return this._query({ Klass, action });
+    }
+
+    memberAction(klass, action) {
       const Klass = klass.constructor;
-      return this._query({ Klass, klass, action: 'delete' });
+      return this._query({ Klass, klass, action });
     }
 
     _query(options) {
@@ -84,9 +93,9 @@
         .then(data => {
           let result;
           if (isArray(data)) {
-            result = data.map(item => new Klass(item));
+            result = map(data, item => new options.Klass(item));
           } else if (isPlainObject(data)) {
-            result = new Klass(data);
+            result = new options.Klass(data);
           } else {
             result = data
           }
@@ -96,7 +105,7 @@
 
     _routeOptions(options) {
       return find(this.router.routes, (route) => {
-        return route.Klass.modelName === options.Klass.modelName &&
+        return route.modelName === options.Klass.modelName &&
           route.action === options.action;
       });
     }
