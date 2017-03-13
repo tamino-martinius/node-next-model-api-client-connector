@@ -75,7 +75,7 @@ describe('NextModelApiClientConnector', function() {
   def('limit', () => undefined);
 
   beforeEach(function() {
-    $router.resource($User, {
+    $router.resource($User.modelName, {
       defaults: $resourceDefaults,
       only: $resourceOnly,
       except: $resourceExcept,
