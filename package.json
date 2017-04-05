@@ -1,6 +1,6 @@
 {
   "name": "next-model-api-client-connector",
-  "version": "0.4.0",
+  "version": "0.2.0",
   "description": "Client side connector for NextModel Api Endpoints.",
   "author": "Tamino Martinius <dev@zaku.eu>",
   "license": "MIT",
