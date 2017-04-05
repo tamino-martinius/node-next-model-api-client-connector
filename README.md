@@ -391,3 +391,4 @@ See [history](HISTORY.md) for more details.
 
 * `0.1.0` **2017-03-15** First release compatible with NextModel 0.4.0
 * `0.1.1` **2017-04-05** Updated next-model dependency
+* `0.2.0` **2017-04-05** First public release
