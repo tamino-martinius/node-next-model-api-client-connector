@@ -1,7 +1,7 @@
 'use strict';
 
 const NextModelApiClientConnector = require('..');
-const NextModelApiRouter = require('../../next-model-api-router');
+const NextModelApiRouter = require('next-model-api-router');
 const NextModel = require('next-model');
 
 const expect = require('expect.js');
